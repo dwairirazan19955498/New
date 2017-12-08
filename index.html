@@ -1,0 +1,307 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title></title>
+	<meta name="viewport" content="width=device-width,initial-scale=1,minimum-scale=1,maximum-scale=1,user-scalable=no">
+	<link rel="stylesheet" type="text/css" href="node_modules\bootstrap\dist\css\bootstrap.min.css">
+	<link rel="stylesheet" type="text/css" href="node_modules\font-awesome\css\font-awesome.min.css">
+	<script src="node_modules\jquery\dist\jquery.min.js"></script>
+	<script src="node_modules\bootstrap\dist\js\bootstrap.min.js"></script>
+	<script src="https://www.gstatic.com/firebasejs/4.6.2/firebase.js"></script>
+	<script src="js\config_firebase.js"></script>
+	<link rel="stylesheet" type="text/css" href="css/style.css">
+     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/materialize/0.100.2/css/materialize.min.css">
+
+  <!-- Compiled and minified JavaScript -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/0.100.2/js/materialize.min.js"></script>
+
+
+</head>
+<body>
+ <!-- navbar -->
+    <div class="navbar navbar-default navbar-fixed-top" role="navigation">
+      <div class="container">
+        <div class="navbar-header">
+          <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
+            <span class="sr-only">Toggle navigation</span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+          </button>
+          <a class="navbar-brand" href="#" id="nameUser"> </a>
+        </div>
+        <div class="navbar-collapse collapse">
+          <ul class="nav navbar-nav">
+            <li class="active"><a href="#">Home</a></li>
+            <li><a href="#about">About</a></li>
+            <li  onclick="Sign_out()" ><a href="#contact">Sign out</a></li>
+          </ul>
+        </div>
+      </div>
+  </div><!-- /navbar -->
+
+
+ <div class="container">
+
+<div class="row" style="padding-top: 60px ;     margin-bottom: 73px;">
+  <ul id="nlist">
+    
+  </ul>
+</div>
+
+
+ </div>
+
+    <footer>
+  
+    	<div class="row" id="bottomNav">
+    <div class="col-xs-4 text-center "><a href="index.html" class="activeColor"><i class="fa fa-home" aria-hidden="true"></i><br>Home</a></div>
+    <div class="col-xs-4 text-center"><a href="Lecture.html"><i class="fa fa-plus-circle" aria-hidden="true"></i><br>Add</a></div>
+    <div class="col-xs-4 text-center"><a href="Account.html"><i class="fa fa-user" aria-hidden="true"></i><br>Account</a></div>
+  </div>
+    
+    </footer>
+
+   <script type="text/javascript">
+
+  function Sign_out() {
+    firebase.auth().signOut().then(function() {
+  window.location.assign('sign_in.html');
+}, function(error) {
+  console.log(' An error happened.' , error);
+   alert (error);
+});
+  }
+  
+  
+var User_ID;
+var name_user;
+function Start() {
+
+   var ref_v22 = firebase.database().ref("Users/" + User_ID + "/");
+   ref_v22.once('value')
+  .then(function(GetData) {
+
+    var Data = GetData.val();
+      name_user = Data.first_name + " " + Data.last_name ;
+      $('#nameUser').text(name_user)
+
+    var scores;
+
+    var ref_v = firebase.database().ref( "Users/"+ User_ID + "/MyLecture/");
+
+
+
+    ref_v.limitToFirst(20).orderByKey().on('value', getData, errData);
+
+    function getData(data){
+         scores = data.val();
+        var keys = Object.keys(scores);
+        console.log(keys);
+
+
+        var myNode = document.getElementById("nlist");
+        myNode.innerHTML = '';
+
+
+
+
+        for (var i = 0; i < keys.length; i++) {
+            var k =keys[i];
+
+      
+            var Lecture_Name = scores[k].Lecture_Name;
+            var Lecture_Number = scores[k].Lecture_Number;
+            var Time_t = scores[k].Time_t;
+            var Date_create = scores[k].Date_add;
+            var Lecture_Ns = scores[k].Lecture_Ns;
+            var atched_Ns = scores[k].atched_Ns;
+         
+
+
+     
+      
+
+        var para = document.createElement("li");
+        var t22 = document.createTextNode(" ");
+        para.appendChild(t22); 
+        document.getElementById("nlist").appendChild(para);
+            
+            para.setAttribute('id', k);  
+            para.setAttribute('class', "card-panel hoverable"); 
+
+
+        var text_vl = document.createElement("h5");        
+        var t = document.createTextNode(Lecture_Name);       
+        text_vl.appendChild(t);                                
+        document.getElementById(k).appendChild(text_vl);   
+
+
+         var n_attced = document.createElement("span");        
+        var nttt = document.createTextNode('0');       
+        n_attced.appendChild(nttt);                                
+        document.getElementById(k).appendChild(n_attced);  
+         n_attced.setAttribute('class', "badge red"); 
+          n_attced.setAttribute('style', "color: white;");
+
+
+           var n_attced2 = document.createElement("span");        
+        var nttt2 = document.createTextNode(atched_Ns);       
+        n_attced2.appendChild(nttt2);                                
+        document.getElementById(k).appendChild(n_attced2);  
+         n_attced2.setAttribute('class', "badge green"); 
+          n_attced2.setAttribute('style', "color: white;");  
+
+
+        var date_vl = document.createElement("p");        
+        var t = document.createTextNode(Date_create);       
+        date_vl.appendChild(t);                                
+        document.getElementById(k).appendChild(date_vl);   
+
+
+
+
+
+
+
+
+        var botton_n = document.createElement("a");        
+        var t = document.createTextNode("Attend");       
+        botton_n.appendChild(t);
+        botton_n.setAttribute('class', "waves-effect  waves-light btn ");
+        var fu_onclick = "Attend('"+ k + "' , "+ atched_Ns + ")"; 
+        botton_n.setAttribute('onclick' , fu_onclick); 
+           botton_n.setAttribute('style' , 'z-index: 0;'); 
+                                       
+        document.getElementById(k).appendChild(botton_n);
+
+/*
+        var botton_nn = document.createElement("a");        
+        var t = document.createTextNode("Edit");       
+        botton_nn.appendChild(t);
+        botton_nn.setAttribute('class', "waves-effect waves-light btn modal-trigger btn botton_n_2");
+        var fu_onclick = "edit_Id('"+k+"' , '"+text+"') ";
+        botton_nn.setAttribute('onclick' , fu_onclick); 
+        botton_nn.setAttribute('href' , '#modal2');                               
+        document.getElementById(k).appendChild(botton_nn);
+
+        var botton_nnn = document.createElement("a");        
+        var t = document.createTextNode("Show QR Code");       
+        botton_nnn.appendChild(t);
+        botton_nnn.setAttribute('class', "waves-effect waves-light btn modal-trigger blue botton_n_2");
+        
+        var fu_onclick = " show_Id('"+k+"' , '"+text+"') ";
+        botton_nnn.setAttribute('onclick' , fu_onclick);
+         botton_nnn.setAttribute('href' , '#modal1');                               
+        document.getElementById(k).appendChild(botton_nnn);
+
+
+*/
+
+
+         
+        }
+
+
+
+    }
+});
+
+
+
+    function errData(err){
+        console.log('Error!');  
+        console.log(err);   
+    }
+
+
+
+}
+
+
+function Attend(key ,n_atch) {
+
+
+
+  if (getCookie(key)) {
+
+     Materialize.toast("You've by attendees", 4000);
+
+  }else{
+
+n_atch = n_atch + 1 ;
+var data = {atched_Ns:n_atch};
+var data22 = {atched_Ns:n_atch , nameUser:name_user};
+
+ var ref_v = firebase.database().ref( "Users/"+ User_ID + "/MyLecture/" + key +  "/");
+ref_v.update(data).then(function() {
+
+ var ref_v222 = firebase.database().ref( "Lectures/" + key +  "/atched/" + User_ID );
+ref_v222.update(data22).then(function() {
+
+
+     Materialize.toast("Done !", 4000);
+  })
+  .catch(function(error) {
+    console.log(' failed' + error.message);
+  });
+
+  })
+  .catch(function(error) {
+    console.log(' failed' + error.message);
+  });
+
+
+
+
+
+
+
+ setCookie(key , key , 2 );
+
+
+  }
+
+ 
+}
+
+function setCookie(cname, cvalue, exdays) {
+    var d = new Date();
+    d.setTime(d.getTime() + (exdays*24*60*60*1000)); //
+    var expires = "expires="+ d.toUTCString();
+    document.cookie = cname + "=" + cvalue + ";" + expires + ";path=/";
+}
+
+
+function getCookie(cname) {
+    var name = cname + "=";
+    var decodedCookie = decodeURIComponent(document.cookie);
+    var ca = decodedCookie.split(';');
+    for(var i = 0; i <ca.length; i++) {
+        var c = ca[i];
+        while (c.charAt(0) == ' ') {
+            c = c.substring(1);
+        }
+        if (c.indexOf(name) == 0) {
+            return c.substring(name.length, c.length);
+        }
+    }
+    return "";
+}
+
+firebase.auth().onAuthStateChanged(function(user) {
+  if (user) {
+  
+window.User_ID = user.uid ;
+Start();
+    
+  } else {
+     window.location.assign('sign_in.html');
+  }
+});
+
+
+</script>
+    <!-- <script type="text/javascript" src="js/myl.js" ></script> -->
+</body>
+</html>
